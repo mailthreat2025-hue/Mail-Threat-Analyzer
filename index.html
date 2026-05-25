@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailThreat Analyzer | Intelligent Email Threat Defense</title>
+    <meta name="description" content="MailThreat Analyzer is a hybrid phishing detection platform that combines machine learning, URL intelligence, explainable AI, and guided response workflows.">
+    <style>
+:root {
+    --bg: #0a0714;
+    --bg-panel: rgba(18, 13, 34, 0.78);
+    --bg-soft: rgba(255, 255, 255, 0.04);
+    --line: rgba(255, 255, 255, 0.09);
+    --text: #f4f1ff;
+    --muted: rgba(244, 241, 255, 0.72);
+    --soft-muted: rgba(244, 241, 255, 0.48);
+    --accent: #7c3aed;
+    --accent-2: #5b8cff;
+    --green: #38d39f;
+    --red: #ff6b6b;
+    --shadow: 0 30px 80px rgba(9, 7, 20, 0.42);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Manrope", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.22), transparent 24%),
+        radial-gradient(circle at 82% 20%, rgba(91, 140, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 55% 70%, rgba(56, 211, 159, 0.08), transparent 20%),
+        linear-gradient(180deg, #080510 0%, #0d0a18 48%, #0a0714 100%);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.site-shell {
+    width: min(1280px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 24px 0 56px;
+}
+
+.topbar {
+    position: sticky;
+    top: 16px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: rgba(12, 9, 24, 0.72);
+    backdrop-filter: blur(18px);
+    box-shadow: var(--shadow);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.brand-wordmark {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.brand-logo {
+    display: block;
+    width: 184px;
+    height: auto;
+    padding: 8px 12px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(242, 236, 255, 0.94));
+    border: 1px solid var(--line);
+    object-fit: contain;
+    box-shadow:
+        0 16px 32px rgba(7, 7, 21, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.topnav {
+    display: inline-flex;
+    align-items: center;
+    gap: 22px;
+    color: var(--muted);
+    font-size: 0.96rem;
+}
+
+.topnav a:hover,
+.footer-links a:hover {
+    color: #fff;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.link-chip,
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 999px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.link-chip {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid rgba(124, 58, 237, 0.32);
+    background: rgba(124, 58, 237, 0.12);
+    color: #fff;
+    font-weight: 700;
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
+    gap: 44px;
+    align-items: center;
+    padding: 72px 0 46px;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    color: var(--soft-muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.eyebrow::before {
+    content: "";
+    width: 42px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.9));
+}
+
+.hero h1,
+.section-heading h2 {
+    margin: 0;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+}
+
+.hero h1 {
+    font-size: clamp(2.8rem, 5vw, 5rem);
+    line-height: 0.96;
+    max-width: 12ch;
+}
+
+.hero-text,
+.section-heading p,
+.capability-card p,
+.workflow-step p,
+.mode-card p,
+.research-card p,
+.faq-item p,
+.site-footer p {
+    color: var(--muted);
+    line-height: 1.75;
+}
+
+.hero-text {
+    margin: 22px 0 28px;
+    max-width: 62ch;
+    font-size: 1.05rem;
+}
+
+.hero-logo-image {
+    display: block;
+    width: min(100%, 420px);
+    height: auto;
+    margin: 0 0 22px;
+    padding: 14px 18px;
+    border-radius: 28px;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(242, 236, 255, 0.94));
+    border: 1px solid rgba(122, 92, 255, 0.22);
+    box-shadow:
+        0 24px 56px rgba(10, 10, 24, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.btn {
+    min-height: 54px;
+    padding: 0 24px;
+    border: 1px solid var(--line);
+    font-weight: 800;
+}
+
+.btn:hover,
+.link-chip:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #7c3aed 0%, #5b8cff 100%);
+    box-shadow: 0 18px 42px rgba(92, 104, 255, 0.24);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.hero-points {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.hero-points li {
+    padding-left: 24px;
+    position: relative;
+    color: var(--muted);
+}
+
+.hero-points li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--green), var(--accent-2));
+    box-shadow: 0 0 12px rgba(56, 211, 159, 0.6);
+}
+
+.hero-visual {
+    position: relative;
+    min-height: 640px;
+    border-radius: 36px;
+    border: 1px solid var(--line);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+        radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.22), transparent 40%),
+        rgba(16, 12, 30, 0.88);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.hero-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 34px 34px;
+    opacity: 0.32;
+}
+
+.hero-orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 58, 237, 0.28);
+    transform: translate(-50%, -50%);
+}
+
+.hero-orbit-outer {
+    width: 520px;
+    height: 520px;
+}
+
+.hero-orbit-inner {
+    width: 320px;
+    height: 320px;
+}
+
+.hero-core {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+}
+
+.hero-core-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    box-shadow: inset 0 0 36px rgba(124, 58, 237, 0.28);
+}
+
+.hero-core-content {
+    position: absolute;
+    inset: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: rgba(10, 7, 20, 0.82);
+    text-align: center;
+}
+
+.hero-core-label {
+    color: var(--soft-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+}
+
+.hero-core-content strong {
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.18rem;
+}
+
+.floating-card {
+    position: absolute;
+    display: flex;
+    gap: 12px;
+    width: min(310px, calc(100% - 40px));
+    padding: 18px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: rgba(17, 13, 31, 0.88);
+    box-shadow: 0 24px 44px rgba(8, 6, 18, 0.4);
+}
+
+.floating-card h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+}
+
+.floating-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.card-risk {
+    top: 42px;
+    right: 32px;
+}
+
+.card-safe {
+    left: 28px;
+    bottom: 124px;
+}
+
+.card-speed {
+    right: 42px;
+    bottom: 38px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    margin-top: 6px;
+    flex: 0 0 auto;
+}
+
+.status-red { background: var(--red); }
+.status-green { background: var(--green); }
+.status-purple { background: var(--accent); }
+
+.stats-band,
+.capability-grid,
+.deployment-grid,
+.research-layout {
+    display: grid;
+    gap: 18px;
+}
+
+.stats-band {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 58px;
+}
+
+.stat-card,
+.capability-card,
+.workflow-step,
+.mode-card,
+.research-card,
+.faq-item,
+.site-footer {
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    box-shadow: var(--shadow);
+}
+
+.stat-card {
+    padding: 22px;
+    border-radius: 22px;
+}
+
+.stat-value {
+    display: block;
+    margin-bottom: 6px;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.section {
+    padding: 42px 0;
+}
+
+.section-heading {
+    max-width: 760px;
+    margin-bottom: 28px;
+}
+
+.section-heading h2 {
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    margin-bottom: 12px;
+}
+
+.capability-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.capability-card,
+.mode-card,
+.research-card {
+    padding: 26px;
+    border-radius: 26px;
+}
+
+.capability-card h3,
+.workflow-step h3,
+.mode-card h3,
+.research-card h3 {
+    margin: 0 0 10px;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.2rem;
+}
+
+.workflow-rail {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.workflow-step {
+    position: relative;
+    overflow: hidden;
+    padding: 26px;
+    border-radius: 26px;
+}
+
+.workflow-step::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.step-index {
+    display: inline-flex;
+    margin-bottom: 18px;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.92rem;
+    color: var(--soft-muted);
+    letter-spacing: 0.16em;
+}
+
+.deployment-grid,
+.research-layout {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.faq-list {
+    display: grid;
+    gap: 14px;
+}
+
+.faq-item {
+    border-radius: 20px;
+    padding: 20px 22px;
+}
+
+.faq-item summary {
+    cursor: pointer;
+    font-weight: 800;
+    list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item p {
+    margin: 14px 0 0;
+}
+
+.site-footer {
+    margin-top: 28px;
+    padding: 26px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.site-footer strong {
+    display: block;
+    margin-bottom: 8px;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.12rem;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+.footer-links {
+    display: flex;
+    gap: 18px;
+    color: var(--muted);
+}
+
+@media (max-width: 1160px) {
+    .brand-logo {
+        width: 164px;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        max-width: 14ch;
+    }
+
+    .hero-visual {
+        min-height: 520px;
+    }
+
+    .stats-band,
+    .capability-grid,
+    .workflow-rail,
+    .deployment-grid,
+    .research-layout {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .topbar {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 760px) {
+    .brand-logo {
+        width: 144px;
+        padding: 6px 10px;
+        border-radius: 16px;
+    }
+
+    .site-shell {
+        width: min(100% - 24px, 1280px);
+        padding-top: 18px;
+    }
+
+    .topbar {
+        border-radius: 18px;
+    }
+
+    .topnav,
+    .topbar-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hero {
+        padding-top: 44px;
+    }
+
+    .hero h1 {
+        font-size: 2.45rem;
+    }
+
+    .hero-visual {
+        min-height: 480px;
+    }
+
+    .card-risk,
+    .card-safe,
+    .card-speed {
+        position: absolute;
+        right: 18px;
+        left: 18px;
+        width: auto;
+    }
+
+    .card-risk {
+        top: 24px;
+    }
+
+    .card-safe {
+        bottom: 132px;
+    }
+
+    .card-speed {
+        bottom: 28px;
+    }
+
+    .stats-band,
+    .capability-grid,
+    .workflow-rail,
+    .deployment-grid,
+    .research-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .site-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-links {
+        flex-wrap: wrap;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="site-shell">
+        <header class="topbar">
+            <a href="#hero" class="brand">
+                <img src="data:image/png;base64,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" alt="MailThreat Analyzer logo" class="brand-logo">
+                <span class="brand-wordmark">MailThreat Analyzer</span>
+            </a>
+            <nav class="topnav">
+                <a href="#capabilities">Capabilities</a>
+                <a href="#workflow">How It Works</a>
+                <a href="#deployment">Deployment</a>
+                <a href="#research">Research</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <div class="topbar-actions">
+                <a class="link-chip" href="#capabilities">Explore Platform</a>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero" id="hero">
+                <div class="hero-copy">
+                    <img src="data:image/jpeg;base64,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H1ooooAKOlGaKACiig0AFFFFABzRR1zR0oAKKKKACiiigAooooAKKKO1ABRRRQAUUUUALRRRQAUUUUAH//1P39KKKKADiiigQUdaKKAClHWiigBKKWigQUUUUAHOKKKADiiiiwooooAKKKKACiiigAooooAWiiigAooooAWiiigAooooAKKKKAFooooAKKKKAClooooAKO9FFABRRR7UAFFFFABRRRQAUUUUAf/9X9/S0UUUAFGaKKACiiigAoFFFFAB0ooooAKM0UUAFFFFABRRRQAUUUUAFLS0UDFooooAKKKKACiiigAooooAKKKKACiiigBaKX60lABSUUtABRRRQAV4j+33puqaL+z34sS8hM32bULZXWQDO1ZXmIP5nFfT9fnh+wh8MNV+Nnx11j4i+J4beHUbLTL+6SVnM8n7k80EA5jGATgD7uDkHtX0+EzV5hjiqmFThZ31XtH8j5nC4rNKVbp7n0V2rxV+F/wANPHdvHq3ijwRp2l2Vc2c95H5aL6svzcj3J/Ov51f8Agpxc3Fx+0T4LgtY2kQ3fw5vbRAjAbGYjMafwM0jYxxkID64r8WNO1LxJ4E8Q2HiXwnqV5DrmoXk5uLC2iIKe6kdwD2P1r+7z1or9WwePjBSjSnfW1uyfkr+R8bl9OphsTGTV1P7N6X2ooooA//Q/f0tFFFABR0oooAKKKWgAooooAKKKKACiiigAooooAKKKKAFooooAKKKKACiiigBaKKKACiiigBaKKKACiiigAooooAKKKKAFooooAKKKKACiiigAooooAKKKKAClooooAKKKKACiiigBaKKKACiiigAooooA//R/f0tFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFGaKKAFooooAKKKKACiiigAooooAKKKKACiiigAooooAWiiigAooooAKKKKACiiigAooooAKKKKAFooooAKKKKACiiigAooooAWiiigAooooAKKKKACiiigA//0v39LS0UUAFGaKKAFooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAFoozRQAUUUUAFFFFAC0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABSUtFABB0oo6UUAJS0tFABRRRQAUUUUAFFFFABRRRQAUUUUAH//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" alt="MailThreat Analyzer logo" class="hero-logo-image">
+                    <div class="eyebrow">Hybrid Phishing Detection Platform</div>
+                    <h1>Explainable inbox defense built for phishing detection, guided response, and research transparency.</h1>
+                    <p class="hero-text">
+                        MailThreat Analyzer helps users and organizations detect suspicious emails using a hybrid pipeline that combines
+                        machine learning, rule-based reasoning, URL intelligence, metadata analysis, and explainable AI. The platform
+                        supports Gmail-connected scanning, simulator-based testing, guided review with Cortex, and persistent threat records
+                        through a web-based dashboard.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="#capabilities">Explore Features</a>
+                        <a class="btn btn-secondary" href="#workflow">See the Workflow</a>
+                    </div>
+                    <ul class="hero-points">
+                        <li>Real Gmail integration with OAuth-based connection</li>
+                        <li>Phishing scoring with explainable reasons and recommended actions</li>
+                        <li>Background monitoring, flagged-email review, analytics, and latency benchmarking</li>
+                    </ul>
+                </div>
+
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="hero-orbit hero-orbit-outer"></div>
+                    <div class="hero-orbit hero-orbit-inner"></div>
+                    <div class="hero-core">
+                        <div class="hero-core-ring"></div>
+                        <div class="hero-core-content">
+                            <span class="hero-core-label">Cortex</span>
+                            <strong>Active Review Loop</strong>
+                        </div>
+                    </div>
+                    <article class="floating-card card-risk">
+                        <span class="status-dot status-red"></span>
+                        <div>
+                            <h3>Threat Analysis</h3>
+                            <p>Score, classify, explain, and preserve suspicious email findings.</p>
+                        </div>
+                    </article>
+                    <article class="floating-card card-safe">
+                        <span class="status-dot status-green"></span>
+                        <div>
+                            <h3>Guided Response</h3>
+                            <p>Review next steps before quarantine, delete, or sender blocking.</p>
+                        </div>
+                    </article>
+                    <article class="floating-card card-speed">
+                        <span class="status-dot status-purple"></span>
+                        <div>
+                            <h3>Latency Transparent</h3>
+                            <p>Per-email inference timing and aggregate performance reporting are built in.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="stats-band" aria-label="MailThreat implementation summary">
+                <div class="stat-card">
+                    <span class="stat-value">Hybrid</span>
+                    <span class="stat-label">ML + rules + URL + metadata</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">XAI</span>
+                    <span class="stat-label">Human-readable phishing reasoning</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">Cortex</span>
+                    <span class="stat-label">Agentic review and action guidance</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">Web</span>
+                    <span class="stat-label">Dashboard, analytics, and threat records</span>
+                </div>
+            </section>
+
+            <section class="section" id="capabilities">
+                <div class="section-heading">
+                    <div class="eyebrow">Current Capabilities</div>
+                    <h2>What MailThreat Analyzer currently supports</h2>
+                    <p>The informational site reflects the live implementation rather than speculative features.</p>
+                </div>
+                <div class="capability-grid">
+                    <article class="capability-card">
+                        <h3>Authentication and access</h3>
+                        <p>Email/password access, Google sign-in, Gmail connection, and discounted-mode access for users who want manual email analysis before connecting Gmail.</p>
+                    </article>
+                    <article class="capability-card">
+                        <h3>Phishing detection pipeline</h3>
+                        <p>Feature extraction across message content, embedded links, sender patterns, reply-to behavior, behavioral pressure cues, grammar signals, and selected metadata indicators.</p>
+                    </article>
+                    <article class="capability-card">
+                        <h3>Explainable AI outputs</h3>
+                        <p>Threat scores, phishing labels, suspicious URL summaries, grouped risk breakdowns, identified risk factors, and response recommendations that help users understand why an email was flagged.</p>
+                    </article>
+                    <article class="capability-card">
+                        <h3>Inbox monitoring</h3>
+                        <p>Manual scanning, automated background monitoring for Gmail-connected users, and simulator-based testing when live inbox access is not available.</p>
+                    </article>
+                    <article class="capability-card">
+                        <h3>Cortex review workflows</h3>
+                        <p>Guided review before action, next-step routing for delete/quarantine/block decisions, persistent flagged-email history, and blocked-email record retention.</p>
+                    </article>
+                    <article class="capability-card">
+                        <h3>Analytics and visibility</h3>
+                        <p>Threat map views, reporting pages, dashboard activity summaries, threat trends, and latency benchmarking logs for research and operational review.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section workflow-section" id="workflow">
+                <div class="section-heading">
+                    <div class="eyebrow">Workflow</div>
+                    <h2>How the platform works</h2>
+                    <p>MailThreat is designed as a practical, end-to-end phishing analysis environment rather than a standalone classifier.</p>
+                </div>
+                <div class="workflow-rail">
+                    <article class="workflow-step">
+                        <span class="step-index">01</span>
+                        <h3>Ingest</h3>
+                        <p>Connect Gmail through OAuth, analyze uploaded or pasted email content, or use the simulator for controlled testing.</p>
+                    </article>
+                    <article class="workflow-step">
+                        <span class="step-index">02</span>
+                        <h3>Analyze</h3>
+                        <p>Extract features from subject lines, body text, URLs, sender identity, reply-to behavior, and other phishing-related cues.</p>
+                    </article>
+                    <article class="workflow-step">
+                        <span class="step-index">03</span>
+                        <h3>Explain</h3>
+                        <p>Return a threat score, classification, risk breakdown, suspicious link details, and user-facing recommendations.</p>
+                    </article>
+                    <article class="workflow-step">
+                        <span class="step-index">04</span>
+                        <h3>Respond</h3>
+                        <p>Let the user review findings and choose guided next steps such as delete, quarantine, or sender blocking where applicable.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section deployment-section" id="deployment">
+                <div class="section-heading">
+                    <div class="eyebrow">Deployment Modes</div>
+                    <h2>Built for live use, fallback testing, and research benchmarking</h2>
+                    <p>The platform supports multiple operational contexts so it can be demonstrated, evaluated, and used under different constraints.</p>
+                </div>
+                <div class="deployment-grid">
+                    <article class="mode-card">
+                        <h3>Gmail-connected mode</h3>
+                        <p>Uses Gmail OAuth and API access to retrieve and analyze inbox messages, support background monitoring, and preserve flagged-email history.</p>
+                    </article>
+                    <article class="mode-card">
+                        <h3>Discounted/manual mode</h3>
+                        <p>Lets users paste or upload email content for analysis before connecting Gmail, while clearly showing which features require Gmail access.</p>
+                    </article>
+                    <article class="mode-card">
+                        <h3>Simulator mode</h3>
+                        <p>Provides a controlled test inbox for repeatable demonstrations, development validation, and evaluation when live Gmail access is unavailable.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section research-section" id="research">
+                <div class="section-heading">
+                    <div class="eyebrow">Research Contribution</div>
+                    <h2>Why the platform matters</h2>
+                    <p>MailThreat Analyzer is positioned as a hybrid phishing detection and response system with emphasis on operational transparency.</p>
+                </div>
+                <div class="research-layout">
+                    <article class="research-card">
+                        <h3>Explainability</h3>
+                        <p>Instead of only producing a label, the system exposes interpretable findings such as suspicious URLs, urgency cues, metadata concerns, grouped risk breakdowns, and recommended next actions.</p>
+                    </article>
+                    <article class="research-card">
+                        <h3>Latency benchmarking</h3>
+                        <p>The platform records per-email inference time and aggregate performance summaries, supporting measurable comparison with published phishing detection systems.</p>
+                    </article>
+                    <article class="research-card">
+                        <h3>Human-in-the-loop response</h3>
+                        <p>Cortex supports guided review and action selection, helping bridge the gap between automated classification and accountable operational decisions.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section faq-section" id="faq">
+                <div class="section-heading">
+                    <div class="eyebrow">FAQ</div>
+                    <h2>Common questions</h2>
+                </div>
+                <div class="faq-list">
+                    <details class="faq-item" open>
+                        <summary>Does MailThreat replace Gmail spam filtering?</summary>
+                        <p>No. MailThreat is positioned as an additional analysis and response layer that emphasizes phishing scoring, explainability, user review, and research-driven visibility beyond ordinary filtering.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Does it require Gmail to work?</summary>
+                        <p>No. Gmail connection unlocks live inbox monitoring, but users can also analyze pasted or uploaded email content and use the simulator-based environment.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>What kind of intelligence does the threat map show?</summary>
+                        <p>The current product includes threat visualization and analytics views based on platform incident data and records surfaced through the MailThreat workflow.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Why is explainable AI important here?</summary>
+                        <p>Phishing decisions are easier to trust and review when the system shows why an email was flagged instead of only returning a raw classification.</p>
+                    </details>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div>
+                <strong>MailThreat Analyzer</strong>
+                <p>Hybrid phishing detection, explainable review, and guided response in a web-based environment.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#capabilities">Capabilities</a>
+                <a href="#deployment">Deployment Modes</a>
+                <a href="#research">Research Value</a>
+            </div>
+        </footer>
+    </div>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const yearTarget = document.querySelector("[data-current-year]");
+    if (yearTarget) {
+        yearTarget.textContent = String(new Date().getFullYear());
+    }
+
+    const heroLogo = document.querySelector(".hero-logo-image");
+    const brandLogo = document.querySelector(".brand-logo");
+    if (heroLogo && brandLogo) {
+        brandLogo.src = heroLogo.currentSrc || heroLogo.src;
+        brandLogo.alt = heroLogo.alt;
+        brandLogo.loading = "eager";
+        brandLogo.decoding = "sync";
+    }
+
+    const cards = Array.from(document.querySelectorAll(".floating-card"));
+    cards.forEach((card, index) => {
+        card.animate(
+            [
+                { transform: "translateY(0px)" },
+                { transform: "translateY(-8px)" },
+                { transform: "translateY(0px)" },
+            ],
+            {
+                duration: 3800 + index * 600,
+                iterations: Infinity,
+                easing: "ease-in-out",
+            }
+        );
+    });
+});
+    </script>
+</body>
+</html>
